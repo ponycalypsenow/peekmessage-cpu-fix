@@ -19,7 +19,9 @@ This patch reduces the CPU usage when running older games, by hooking PeekMessag
 
    For the convenience a bat file for SimCity 4 got included.
 
-4. If the original executable requires administrator privledges, it has to be run by right clicking either the shortcut, or the bat file and choosing "Run as Administrator".
+4. If the original executable requires administrator privledges, the shortcut has to be right-clicked, and run with "Run as Administrator" option.
+
+   Alternatively, the command prompt should be executed with the administrator rights.
 
 ## Build instructions
 
