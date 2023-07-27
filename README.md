@@ -28,10 +28,10 @@ This patch reduces the CPU usage when running older games, by hooking PeekMessag
 1. From the [Tiny C Compiler repository](http://download.savannah.gnu.org/releases/tinycc/), download:
    - tcc-0.9.27-win32-bin.zip
    - winapi-full-for-0.9.27.zip
-   - tcc-0.9.26-win64-bin.zip
+   - tcc-0.9.26-win32-bin.zip
 
 2. Extract the contents of tcc-0.9.27-win32-bin
 3. Overwrite the /include directory with the one included in winapi-full-for-0.9.27.zip
-4. From tcc-0.9.26-win64-bin.zip copy tiny_impdef.exe into the same directory as tcc.exe
+4. From tcc-0.9.26-win32-bin.zip copy tiny_impdef.exe into the same directory as tcc.exe
 5. Copy loader.c, dll.c, and make.bat into the same directory as tcc.exe
 6. Run make.bat
