@@ -1,0 +1,1 @@
+loader -e "SimCity 4.exe" -p "-CPUCount:1 -CustomResolution:enabled -r1440x900x32 -w -intro:off -d:DirectX"
