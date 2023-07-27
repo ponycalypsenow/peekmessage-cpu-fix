@@ -8,7 +8,7 @@ This patch reduces the CPU usage when running older games, by hooking PeekMessag
 
 ## Installation
 
-1. Unpack the `loader.exe` and `loader.dll` into the game folder.
+1. Unpack the `loader.exe` and `loader.dll` into the game folder (same directory as the entrypoint exe).
 
 2. Create a shortcut of `loader.exe` and use the `-e` command line argument to target the game exe file.
    For passing additional command line arguments to the executable you can use `-p`.
@@ -23,7 +23,7 @@ This patch reduces the CPU usage when running older games, by hooking PeekMessag
 
    Alternatively, the command prompt should be executed with the administrator rights.
 
-## Build instructions
+## Building instructions
 
 1. From the [Tiny C Compiler repository](http://download.savannah.gnu.org/releases/tinycc/), download:
    - tcc-0.9.27-win32-bin.zip
