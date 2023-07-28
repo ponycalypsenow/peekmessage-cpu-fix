@@ -35,6 +35,7 @@ This patch reduces the CPU usage when running older games, by hooking PeekMessag
 4. Copy loader.c, dll.c, and make_tcc.bat into the same directory as tcc.exe
 5. Run make_tcc.bat, or manually execute:
       ```tcc -shared dll.c -o loader.dll
+      
       tcc loader.c -o loader.exe -lshell32
       ```
 
@@ -46,5 +47,6 @@ This patch reduces the CPU usage when running older games, by hooking PeekMessag
 3. Copy loader.c, dll.c, and make_dmc.bat into the same directory as dmc.exe (it's in the /bin subfolder)
 4. Inside of the /bin subfolder, run make_dmc.bat, or manually execute:
       ```dmc loader.c shell32.lib
+      
       dmc dll.c kernel32.lib -WD -oloader.dll
       ```
