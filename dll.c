@@ -1,10 +1,6 @@
 #include <stdio.h>
 #include <windows.h>
-#include <psapi.h>
-#include <dbghelp.h>
 #include <math.h>
-
-WINMMAPI DWORD WINAPI timeGetTime(void);
 
 #define MODULE_NAME "loader.dll"
 #define CONFIG_FILE "loader.ini"
@@ -13,6 +9,7 @@ WINMMAPI DWORD WINAPI timeGetTime(void);
 #define LOG_LEVEL_INFO 2
 #define LOG_LEVEL_DEBUG 3
 #define LOG_LEVEL_TRACE 4
+#define MWMO_INPUTAVAILABLE 0x0004
 
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define MAX(a, b) (((a) > (b)) ? (a) : (b))
@@ -360,12 +357,11 @@ BOOL InitializeTimer()
     {
         LogDebug("High precision timer not supported.");
 
-        g_dTimerStart = round((DOUBLE)timeGetTime() * 1000.0);
+        g_dTimerStart = round((DOUBLE)GetTickCount() * 1000.0);
     }
     else
     {
         LARGE_INTEGER timerCounter;
-
         g_bTimerHighResolution = TRUE;
         g_dTimerFrequency = (DOUBLE)timerFrequency.QuadPart / 1000000.0;
         QueryPerformanceCounter(&timerCounter);
@@ -382,9 +378,7 @@ DOUBLE GetTimerCurrentTime()
 
     if (!g_bTimerHighResolution)
     {
-        timeBeginPeriod(1);
-        dNow = round((DOUBLE)timeGetTime() * 1000.0);
-        timeEndPeriod(1);
+        dNow = round((DOUBLE)GetTickCount() * 1000.0);
     }
     else
     {
@@ -430,20 +424,20 @@ LPDWORD SearchIat(LPCSTR functionName)
     }
 
     PIMAGE_DATA_DIRECTORY pDataDirectory = &pNtHeaders->OptionalHeader.DataDirectory[1];
-    PIMAGE_IMPORT_DESCRIPTOR pImportDescriptor = (PIMAGE_IMPORT_DESCRIPTOR)((LPBYTE)pDosHeader + pDataDirectory->VirtualAddress);
-    PIMAGE_THUNK_DATA32 pOriginalFirstThunk = (PIMAGE_THUNK_DATA32)((LPBYTE)pDosHeader + pImportDescriptor->OriginalFirstThunk);
+    PIMAGE_IMPORT_DESCRIPTOR pImportDescriptor = (PIMAGE_IMPORT_DESCRIPTOR)((BYTE *)pDosHeader + pDataDirectory->VirtualAddress);
+    PIMAGE_THUNK_DATA pOriginalFirstThunk = (PIMAGE_THUNK_DATA)((BYTE *)pDosHeader + (DWORD)pImportDescriptor->OriginalFirstThunk);
 
     while (pOriginalFirstThunk != 0)
     {
-        pOriginalFirstThunk = (PIMAGE_THUNK_DATA32)((LPBYTE)pDosHeader + pImportDescriptor->OriginalFirstThunk);
+        pOriginalFirstThunk = (PIMAGE_THUNK_DATA)((BYTE *)pDosHeader + (DWORD)pImportDescriptor->OriginalFirstThunk);
 
-        PIMAGE_THUNK_DATA32 pFirstThunk = (PIMAGE_THUNK_DATA32)((LPBYTE)pDosHeader + pImportDescriptor->FirstThunk);
+        PIMAGE_THUNK_DATA pFirstThunk = (PIMAGE_THUNK_DATA)((BYTE *)pDosHeader + (DWORD)pImportDescriptor->FirstThunk);
 
         while (pOriginalFirstThunk->u1.AddressOfData != 0)
         {
-            PIMAGE_IMPORT_BY_NAME pImport = (PIMAGE_IMPORT_BY_NAME)((LPBYTE)pDosHeader + (DWORD)pOriginalFirstThunk->u1.AddressOfData);
+            PIMAGE_IMPORT_BY_NAME pImport = (PIMAGE_IMPORT_BY_NAME)((BYTE *)pDosHeader + (DWORD)pOriginalFirstThunk->u1.AddressOfData);
 
-            if (!((DWORD)pOriginalFirstThunk->u1.Function & (DWORD)IMAGE_ORDINAL_FLAG32))
+            if (!((DWORD)pOriginalFirstThunk->u1.Function & (DWORD)IMAGE_ORDINAL_FLAG))
             {
                 if (strcmp(functionName, (LPCSTR)pImport->Name) == 0)
                 {
@@ -491,7 +485,6 @@ BOOL PatchApplication(HANDLE hProcess)
     g_dMessageWaitTimeThreshold = GetMessageWaitTimeThresholdMs() * 1000.0;
     g_dMessageProcessingTimeThreshold = GetMessageProcessingTimeThresholdMs() * 1000.0;
     g_dwMessageWaitTimeMin = GetMessageWaitTimeMinMs();
-    ;
     g_dwMessageWaitTimeMax = GetMessageWaitTimeMaxMs();
     g_dwMessageWaitTime = g_dwMessageWaitTimeMin;
     g_dwMessageWaitTimeInc = MAX(1, (g_dwMessageWaitTimeMax - g_dwMessageWaitTimeMin) / 10);
