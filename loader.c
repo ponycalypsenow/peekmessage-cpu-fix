@@ -5,8 +5,8 @@
 #include <stdio.h>
 #include <shellapi.h>
 
-typedef BOOL(WINAPI *__WriteProcessMemory__)(HANDLE, LPVOID, LPCVOID, SIZE_T, SIZE_T *);
-typedef PVOID(WINAPI *__VirtualAllocEx__)(HANDLE, PVOID, DWORD, DWORD, DWORD);
+typedef BOOL(WINAPI *__WriteProcessMemory__)(HANDLE, LPVOID, LPCVOID, DWORD, LPDWORD);
+typedef PVOID(WINAPI *__VirtualAllocEx__)(HANDLE, LPVOID, DWORD, DWORD, DWORD);
 
 const CHAR DLL_NAME[] = "loader.dll";
 
